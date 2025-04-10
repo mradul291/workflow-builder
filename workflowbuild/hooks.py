@@ -8,6 +8,10 @@ app_license = "mit"
 # Apps
 # ------------------
 
+override_whitelisted_methods = {
+	"workflowbuild.schedule.trigger_event.check_trigger_event": "workflowbuild.schedule.trigger_event.check_trigger_event"
+}
+
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
