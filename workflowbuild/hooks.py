@@ -141,6 +141,14 @@ override_whitelisted_methods = {
 # ---------------
 # Hook on document methods and events
 
+doc_events = {
+  "Lead": {
+      "on_update": "workflowbuild.events.lead_event.after_save_all",
+      "after_insert":"workflowbuild.lead_event.after_save_all"
+  }
+}
+# doc_events = {"Lead": {"before_save":"workflowbuild.lead_event.after_save_all"}}
+
 # doc_events = {
 # 	"*": {
 # 		"on_update": "method",
