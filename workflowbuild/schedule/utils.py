@@ -6,18 +6,24 @@ from frappe.utils import now_datetime, format_duration
 from rq.job import Job
 from redis import Redis
 from .logs import  update_scheduled_job
+from dotenv import load_dotenv
 import time
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
 def send_email(email_detail, doc):
     
     """Send Email using provided email_template"""
     try:
         print("Current job Id Email", get_current_job())
-        new_path = "/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites"  # Replace with your desired path
+        new_path = os.getenv("SITE_PATH")
+        site_name = os.getenv("SITE_NAME")
+        db_name = os.getenv("DB_NAME")
+        
         os.chdir(new_path)
         
-        frappe.init(site="/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites/workflow.local")
-        frappe.connect(site="/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites/workflow.local",db_name="_28ce801016e87d3c")
+        frappe.init(site=os.path.join(new_path, site_name))
+        frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
 
         started_at = now_datetime()
 
@@ -69,11 +75,15 @@ def assign_task(action, doc):
     """Create ToDo for assigned user"""
     print("User ---", action)
 
-    new_path = "/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites"  # Replace with your desired path
+    new_path = os.getenv("SITE_PATH")
+    site_name = os.getenv("SITE_NAME")
+    db_name = os.getenv("DB_NAME")
+    
     os.chdir(new_path)
     
-    frappe.init(site="/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites/workflow.local")
-    frappe.connect(site="/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites/workflow.local",db_name="_28ce801016e87d3c")
+    frappe.init(site=os.path.join(new_path, site_name))
+    frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
+    
     started_at = now_datetime()
 
     try:

@@ -8,9 +8,6 @@ app_license = "mit"
 # Apps
 # ------------------
 
-override_whitelisted_methods = {
-	"workflowbuild.schedule.trigger_event.check_trigger_event": "workflowbuild.schedule.trigger_event.check_trigger_event"
-}
 
 scheduler_events = {
     "cron": {
