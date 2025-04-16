@@ -1,5 +1,6 @@
 import frappe
 from workflowbuild.schedule.execute_action import check_trigger_event
+import time
 def after_save_all(doc, method):
     
     workflow_name = doc.custom_workflow
@@ -8,15 +9,14 @@ def after_save_all(doc, method):
     if workflow_name:
         workflow_data = frappe.get_doc('Workflow Configuration', workflow_name)
         
-        print("workflow_Data",workflow_data)
         if workflow_data.trigger_event == "New Lead":
             workflow_actions = workflow_data.workflow_action
             workflow_actions_data = [
-                frappe.get_doc('Workflow Actions', action.name).as_dict()
+                frappe.get_doc('Workflow Actions', action.name).as_dict() 
                 for action in workflow_actions
             ]
             doc_dict = doc.as_dict()
-            print(doc_dict)
+            
             # Call the custom method
             try:
                 

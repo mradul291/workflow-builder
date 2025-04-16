@@ -12,6 +12,14 @@ override_whitelisted_methods = {
 	"workflowbuild.schedule.trigger_event.check_trigger_event": "workflowbuild.schedule.trigger_event.check_trigger_event"
 }
 
+scheduler_events = {
+    "cron": {
+        "0/1 * * * *": [  # every 1 minute
+          "workflowbuild.schedule.logs.refresh_job"  # function to execute
+        ]
+    }
+}
+
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
@@ -143,8 +151,7 @@ override_whitelisted_methods = {
 
 doc_events = {
   "Lead": {
-      "on_update": "workflowbuild.events.lead_event.after_save_all",
-      "after_insert":"workflowbuild.lead_event.after_save_all"
+      "after_insert":"workflowbuild.events.lead_event.after_save_all"
   }
 }
 # doc_events = {"Lead": {"before_save":"workflowbuild.lead_event.after_save_all"}}

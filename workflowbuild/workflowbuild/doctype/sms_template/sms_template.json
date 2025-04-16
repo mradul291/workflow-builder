@@ -34,7 +34,7 @@
     "links": [],
     "modified": "2025-04-07 18:20:45.095728",
     "modified_by": "Administrator",
-    "module": "Workflowapp",
+    "module": "Workflowbuild",
     "name": "SMS Template",
     "naming_rule": "By fieldname",
     "owner": "Administrator",
