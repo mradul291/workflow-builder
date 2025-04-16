@@ -20,6 +20,13 @@ def send_email(email_detail, doc):
         site_name = os.getenv("SITE_NAME")
         db_name = os.getenv("DB_NAME")
         
+        print("Current Path",os.getcwd())
+        print("New Path",new_path)
+        print("Site Name",site_name)
+        print("DB Name",db_name)
+
+        print("\n")
+        
         os.chdir(new_path)
         
         frappe.init(site=os.path.join(new_path, site_name))
