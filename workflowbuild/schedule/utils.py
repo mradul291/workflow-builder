@@ -1,13 +1,5 @@
-import frappe
-from frappe.utils import now_datetime
-from rq import get_current_job
 import os
-from frappe.utils import now_datetime, format_duration
-from rq.job import Job
-from redis import Redis
-from .logs import  update_scheduled_job
 from dotenv import load_dotenv
-import time
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 new_path = os.getenv("SITE_PATH")
@@ -16,8 +8,23 @@ db_name = os.getenv("DB_NAME")
 
 os.chdir(new_path)
 
+
+
+import frappe
+from frappe.utils import now_datetime
+from rq import get_current_job
+from frappe.utils import now_datetime, format_duration
+from rq.job import Job
+from redis import Redis
+from .logs import  update_scheduled_job
+
+import time
+
 frappe.init(site=os.path.join(new_path, site_name))
 frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
+
+
+
 
 def send_email(email_detail, doc):
     
