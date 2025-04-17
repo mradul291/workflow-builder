@@ -24,12 +24,13 @@ def check_trigger_event(workflow_actions, doc):
                 email_detail = {
                     "email_temp": email_template,
                     "email_id": doc.email_id,
+                    "doc":doc
                 }
 
                 job = queue.enqueue_in(
                     timedelta(days=execution_days),
                     "workflowbuild.schedule.utils.send_email",
-                    args=[email_detail, doc]
+                    args=[email_detail]
                 )
                 job_args_serializable = []
 
