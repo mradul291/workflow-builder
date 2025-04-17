@@ -10,39 +10,34 @@ from dotenv import load_dotenv
 import time
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
+new_path = os.getenv("SITE_PATH")
+site_name = os.getenv("SITE_NAME")
+db_name = os.getenv("DB_NAME")
+
+os.chdir(new_path)
+
+frappe.init(site=os.path.join(new_path, site_name))
+frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
 
 def send_email(email_detail, doc):
     
     """Send Email using provided email_template"""
     try:
         print("Current job Id Email", get_current_job())
-        new_path = os.getenv("SITE_PATH")
-        site_name = os.getenv("SITE_NAME")
-        db_name = os.getenv("DB_NAME")
         
-        print("Current Path",os.getcwd())
-        print("New Path",new_path)
-        print("Site Name",site_name)
-        print("DB Name",db_name)
-
-        print("\n")
-        
-        os.chdir(new_path)
-        
-        frappe.init(site=os.path.join(new_path, site_name))
-        frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
-
         started_at = now_datetime()
+
+        print("1")
 
         # try:
         if not email_detail.get("email_temp") or not doc.email_id:
             return
         email_temp = email_detail.get("email_temp")
-        
+        print("2")
         # Render subject and body using Jinja and context from doc
         subject = frappe.render_template(email_temp.subject, doc)
         message = frappe.render_template(email_temp.response, doc)
-
+        print("3")
         frappe.sendmail(
             recipients=[doc.email_id],
             subject=subject or "Notification",
@@ -50,10 +45,11 @@ def send_email(email_detail, doc):
             delayed=False
         )
         job_id = get_current_job().id
-
+        print("4")
         redis_conn = Redis()
         job = Job.fetch(job_id, connection=redis_conn)
         status = job.get_status()  # e.g., "queued", "started", "finished"
+        print("5")
         
         update_scheduled_job(job_id, status, started_at)
     except Exception as error:
@@ -78,19 +74,8 @@ def assign_task(action, doc):
 
     print("Current job Id Todo", get_current_job())
 
-    
     """Create ToDo for assigned user"""
     print("User ---", action)
-
-    new_path = os.getenv("SITE_PATH")
-    site_name = os.getenv("SITE_NAME")
-    db_name = os.getenv("DB_NAME")
-    
-    os.chdir(new_path)
-    
-    frappe.init(site=os.path.join(new_path, site_name))
-    frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
-    
     started_at = now_datetime()
 
     try:
