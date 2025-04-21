@@ -17,6 +17,10 @@ scheduler_events = {
     }
 }
 
+override_whitelisted_methods = {
+	"workflowbuild.schedule.logs.refresh_job": "workflowbuild.schedule.logs.refresh_job"
+}
+
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
@@ -148,7 +152,7 @@ scheduler_events = {
 
 doc_events = {
   "Lead": {
-      "after_insert":"workflowbuild.events.lead_event.after_save_all"
+      "on_change":"workflowbuild.events.lead_event.after_save_all"
   }
 }
 # doc_events = {"Lead": {"before_save":"workflowbuild.lead_event.after_save_all"}}

@@ -5,7 +5,6 @@ from redis import Redis
 from .logs import create_scheduled_job
 import os
 import json
-from .utils import send_email, assign_task
 
 def check_trigger_event(workflow_actions, doc):
     print("start path",os.getcwd())
@@ -30,8 +29,8 @@ def check_trigger_event(workflow_actions, doc):
                 }
 
                 job = queue.enqueue_in(
-                    timedelta(days=execution_days),
-                    send_email(),
+                    timedelta(seconds=int(execution_days)),
+                    "workflowbuild.schedule.utils.send_email",
                     args=[email_detail]
                 )
                 job_args_serializable = []
@@ -64,8 +63,8 @@ def check_trigger_event(workflow_actions, doc):
 
             elif action_type == "ToDO":
                 job = queue.enqueue_in(
-                    timedelta(seconds=3),
-                    assign_task(),
+                    timedelta(seconds=int(execution_days)),
+                    "workflowbuild.schedule.utils.assign_task",
                     args=[action, doc]
                 )
                 job_args_serializable = []

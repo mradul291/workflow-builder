@@ -1,70 +1,71 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "autoname": "field:workflow_name",
-    "creation": "2025-04-07 15:27:24.013032",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "workflow_name",
-        "trigger_event",
-        "column_break_amzq",
-        "section_break_izda",
-        "workflow_action"
-    ],
-    "fields": [
-        {
-            "fieldname": "workflow_name",
-            "fieldtype": "Data",
-            "label": "Workflow Name",
-            "unique": 1
-        },
-        {
-            "fieldname": "trigger_event",
-            "fieldtype": "Select",
-            "label": "Trigger Event ",
-            "options": "New Lead\nLoan Application Sent"
-        },
-        {
-            "fieldname": "column_break_amzq",
-            "fieldtype": "Column Break"
-        },
-        {
-            "fieldname": "section_break_izda",
-            "fieldtype": "Section Break"
-        },
-        {
-            "fieldname": "workflow_action",
-            "fieldtype": "Table",
-            "label": "Workflow Actions",
-            "options": "Workflow Actions"
-        }
-    ],
-    "grid_page_length": 50,
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2025-04-07 18:20:25.843980",
-    "modified_by": "Administrator",
-    "module": "Workflowbuild",
-    "name": "Workflow Configuration",
-    "naming_rule": "By fieldname",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "export": 1,
-            "print": 1,
-            "read": 1,
-            "report": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "row_format": "Dynamic",
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:workflow_name",
+ "creation": "2025-04-07 15:27:24.013032",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "workflow_name",
+  "trigger_event",
+  "column_break_amzq",
+  "section_break_izda",
+  "workflow_action"
+ ],
+ "fields": [
+  {
+   "fieldname": "workflow_name",
+   "fieldtype": "Data",
+   "label": "Workflow Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "trigger_event",
+   "fieldtype": "Link",
+   "label": "Trigger Event ",
+   "options": "Workflow State",
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_amzq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_izda",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "workflow_action",
+   "fieldtype": "Table",
+   "label": "Workflow Actions",
+   "options": "Workflow Actions"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-21 18:10:35.282049",
+ "modified_by": "Administrator",
+ "module": "Workflowbuild",
+ "name": "Workflow Configuration",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

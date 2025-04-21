@@ -54,6 +54,7 @@ def update_scheduled_job(job_id, status=None, started_at=None):
         frappe.log_error(frappe.get_traceback(), "Scheduled Job Update Error")
         print(f"Error updating Scheduled Job '{job_id}':", e)
 
+@frappe.whitelist(allow_guest=True)
 def refresh_job():
     try:
         print("Refresh Active")

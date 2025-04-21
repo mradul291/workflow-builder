@@ -2,12 +2,13 @@ import os
 import frappe
 from frappe.utils import now_datetime
 from rq import get_current_job
-from frappe.utils import now_datetime, format_duration
+from frappe.utils import now_datetime
 from rq.job import Job
 from redis import Redis
 from .logs import  update_scheduled_job
 from dotenv import load_dotenv
-import time
+from datetime import timedelta
+
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 new_path = os.getenv("SITE_PATH")
@@ -83,16 +84,27 @@ def assign_task(action, doc):
     try:
         
         if not action.get('assigned_user'):
+            assigned_user = doc.get('email_id')
+        else:
+            assigned_user = action.get('assigned_user')
+
+        todo_temp = frappe.get_doc("ToDo Template", action.get('todo_template'))
+        if not todo_temp:
             return
-    
+        
+        description = todo_temp.get("description")
+        due_date = todo_temp.get("due_date")
+        # due_date is in seconds , convert to datetime
+        due_date = now_datetime() + timedelta(seconds=due_date)
+        
         todo = frappe.get_doc({
             "doctype": "ToDo",
-            "description": doc.get('request_type') or "Action Required",
+            "description": description,
             "owner": doc.get('lead_owner'),
             "reference_type": "Lead",
             "reference_name": doc.get('name'),
-            "allocated_to":action.get('assigned_user'),
-            "date": now_datetime().date(),
+            "allocated_to":assigned_user,
+            "date":due_date,
             "assigned_by":doc.get('lead_owner')
         }).insert(ignore_permissions=True)
 
