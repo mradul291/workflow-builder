@@ -12,7 +12,10 @@ def check_trigger_event(workflow_actions, doc):
         """Cron job to check if any workflow event is triggered and act on the configured actions"""
         print("Current Path",os.getcwd())
         
-        queue = Queue(name='default', connection=Redis())
+        queue_email = Queue(name='email', connection=Redis())
+        queue_sms = Queue(name='sms', connection=Redis())
+        queue_todo = Queue(name='todo', connection=Redis())
+
 
         for action in workflow_actions:
 
@@ -28,7 +31,7 @@ def check_trigger_event(workflow_actions, doc):
                     "doc":doc
                 }
 
-                job = queue.enqueue_in(
+                job = queue_email.enqueue_in(
                     timedelta(seconds=int(execution_days)),
                     "workflowbuild.schedule.utils.send_email",
                     args=[email_detail]
@@ -62,7 +65,7 @@ def check_trigger_event(workflow_actions, doc):
                     pass
 
             elif action_type == "ToDO":
-                job = queue.enqueue_in(
+                job = queue_todo.enqueue_in(
                     timedelta(seconds=int(execution_days)),
                     "workflowbuild.schedule.utils.assign_task",
                     args=[action, doc]

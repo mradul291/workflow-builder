@@ -34,7 +34,7 @@ def create_scheduled_job(job_data):
         return None
 
 
-def update_scheduled_job(job_id, status=None, started_at=None):
+def update_scheduled_job(job_id, status=None, started_at=None, error_msg=None):
     
     try:
         job_doc = frappe.get_doc("Scheduled  Job", job_id)
@@ -43,6 +43,8 @@ def update_scheduled_job(job_id, status=None, started_at=None):
             job_doc.status = status
         if started_at is not None:
             job_doc.started_at = started_at
+        if error_msg is not None:
+            job_doc.exc_info = error_msg
         
 
         job_doc.save(ignore_permissions=True)

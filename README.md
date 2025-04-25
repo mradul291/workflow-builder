@@ -40,6 +40,15 @@ rq: rq worker --with-scheduler
 
 ### 2. Make Sure to add workflow Configuration to make it run
 
+### 3. Add .env File in root folder with below content
+
+```
+SITE_PATH=/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites
+SITE_NAME=workflow.local
+DB_NAME=_28ce80########
+
+```
+
 ## 💡 Notes
 
 - Ensure `bench start` or `bench start --watch` is running during development.

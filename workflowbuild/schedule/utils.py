@@ -53,8 +53,15 @@ def send_email(email_detail):
         job = Job.fetch(job_id, connection=redis_conn)
         status = job.get_status()  # e.g., "queued", "started", "finished"
         print("5")
-        
-        update_scheduled_job(job_id, status, started_at)
+        print("job.exc_info -- Email", job.exc_info)
+
+        if status == "failed":
+        # Fetch the exception info (if available) for the failed job
+            exc_info = job.exc_info
+            update_scheduled_job(job_id, status, started_at, exc_info)
+        else:
+            update_scheduled_job(job_id, status, started_at)
+
     except Exception as error:
         print("Error In Email Sending", error)
     finally:
@@ -116,9 +123,13 @@ def assign_task(action, doc):
         redis_conn = Redis()
         job = Job.fetch(job_id, connection=redis_conn)
         status = job.get_status()  # e.g., "queued", "started", "finished"
-        # ended_at = now_datetime()
-        # status = fetch status from job
-        update_scheduled_job(job_id, status, started_at)
+        print("job.exc_info -- TODO", job.exc_info)
+        if status == "failed":
+        # Fetch the exception info (if available) for the failed job
+            exc_info = job.exc_info
+            update_scheduled_job(job_id, status, started_at, exc_info)
+        else:
+            update_scheduled_job(job_id, status, started_at)
 
         
         
