@@ -38,20 +38,7 @@ In the **root directory of your Frappe bench**, open or create the `Procfile` an
 rq: rq worker --with-scheduler
 ```
 
-### 2. Add Custom Field in Lead Doctype
-
-Manually add a custom field to the **Lead** doctype:
-
-- **Field Name:** `custom_workflow`
-- **Label:** `Workflow`
-- **Field Type:** Link (option: set options to `Workflow Configuration`)
-
-Steps:
-
-- Go to **Settings > Customization > Customize Form**
-- Select **Doctype: Lead**
-- Add a new field with the above specifications
-- Save and reload
+### 2. Make Sure to add workflow Configuration to make it run
 
 ## 💡 Notes
 
