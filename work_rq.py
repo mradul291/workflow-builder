@@ -2,15 +2,18 @@ from rq import Worker, Queue, Connection
 from redis import Redis
 import os
 import frappe
+from dotenv import load_dotenv
 
 # List of queues to listen to (unchanged)
 listen = ['default', 'email', 'sms', 'todo']
 workers_count = 2  # Number of workers to start
 redis_conn = Redis()
 
-site_path = os.environ.get("SITE_PATH", "/home/mycomputer/Pankaj/WorkFlow2/frappe-bench/sites")
-site_name = os.environ.get("SITE_NAME", "workflow.local")
-db_name = os.environ.get("DB_NAME", "workflow.local")
+load_dotenv(os.path.join(os.path.dirname(__file__), './.env'))
+
+site_path = os.getenv("SITE_PATH")
+site_name = os.getenv("SITE_NAME")
+db_name = os.getenv("DB_NAME")
 
 os.chdir(site_path)
 frappe.init(site=os.path.join(site_path, site_name))
