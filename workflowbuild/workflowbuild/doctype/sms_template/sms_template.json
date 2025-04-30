@@ -1,59 +1,59 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "autoname": "field:template_name",
-    "creation": "2025-04-07 15:47:52.225913",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "template_name",
-        "enable",
-        "template_text"
-    ],
-    "fields": [
-        {
-            "fieldname": "template_name",
-            "fieldtype": "Data",
-            "label": "Template Name",
-            "unique": 1
-        },
-        {
-            "default": "0",
-            "fieldname": "enable",
-            "fieldtype": "Check",
-            "label": "Enable"
-        },
-        {
-            "fieldname": "template_text",
-            "fieldtype": "Text Editor",
-            "label": "Template Text"
-        }
-    ],
-    "grid_page_length": 50,
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2025-04-07 18:20:45.095728",
-    "modified_by": "Administrator",
-    "module": "Workflowbuild",
-    "name": "SMS Template",
-    "naming_rule": "By fieldname",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "export": 1,
-            "print": 1,
-            "read": 1,
-            "report": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "row_format": "Dynamic",
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:template_name",
+ "creation": "2025-04-07 15:47:52.225913",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "template_name",
+  "enable",
+  "template_text"
+ ],
+ "fields": [
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "fieldname": "template_text",
+   "fieldtype": "Text",
+   "label": "Template Text"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-30 13:52:34.301847",
+ "modified_by": "Administrator",
+ "module": "Workflowbuild",
+ "name": "SMS Template",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

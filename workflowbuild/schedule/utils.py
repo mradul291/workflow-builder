@@ -8,7 +8,7 @@ from redis import Redis
 from .logs import  update_scheduled_job
 from dotenv import load_dotenv
 from datetime import timedelta
-
+from frappe.core.doctype.sms_settings.sms_settings import send_sms
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 new_path = os.getenv("SITE_PATH")
@@ -21,121 +21,148 @@ frappe.init(site=os.path.join(new_path, site_name))
 frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
 
 def send_email(email_detail):
-    
-    """Send Email using provided email_template"""
+    """Send Email using provided email_template and log job status"""
+
+    started_at = now_datetime()
+    job_id = get_current_job().id if get_current_job() else None
+
     try:
         print("Current job Id Email", get_current_job())
-        
-        started_at = now_datetime()
 
-        print("1")
         doc = email_detail.get("doc")
         if not doc:
-            return
-        # try:
-        if not email_detail.get("email_temp") or not doc.email_id:
-            return
+            raise ValueError("Document not provided")
+
         email_temp = email_detail.get("email_temp")
-        print("2")
-        # Render subject and body using Jinja and context from doc
+        if not email_temp or not doc.get('email_id'):
+            raise ValueError("Missing email template or recipient email ID")
+
+        # Render subject and message using Jinja and doc context
         subject = frappe.render_template(email_temp.subject, doc)
         message = frappe.render_template(email_temp.response, doc)
-        print("3")
+
         frappe.sendmail(
             recipients=[doc.email_id],
             subject=subject or "Notification",
             message=message,
             delayed=False
         )
-        job_id = get_current_job().id
-        print("4")
-        redis_conn = Redis()
-        job = Job.fetch(job_id, connection=redis_conn)
-        status = job.get_status()  # e.g., "queued", "started", "finished"
-        print("5")
-        print("job.exc_info -- Email", job.exc_info)
 
-        if status == "failed":
-        # Fetch the exception info (if available) for the failed job
-            exc_info = job.exc_info
-            update_scheduled_job(job_id, status, started_at, exc_info)
-        else:
-            update_scheduled_job(job_id, status, started_at)
+        print("Email sent to:", doc.email_id)
+
+        if job_id:
+            redis_conn = Redis()
+            job = Job.fetch(job_id, connection=redis_conn)
+            status = job.get_status()
+            print("job.exc_info -- Email", job.exc_info)
+
+            if status == "failed":
+                update_scheduled_job(job_id, status, started_at, job.exc_info)
+            else:
+                update_scheduled_job(job_id, status, started_at)
 
     except Exception as error:
-        print("Error In Email Sending", error)
+        print("Error in Email Sending:", error)
+        if job_id:
+            update_scheduled_job(job_id, "failed", started_at, str(error))
+
     finally:
         frappe.destroy()
+
+def sends_sms(action, doc):
+    """Send SMS using provided sms_template and log job status"""
     
+    started_at = now_datetime()
+    job_id = get_current_job().id if get_current_job() else None
 
-def send_sms(action):
-    """Send SMS using provided sms_template"""
     try:
-        if not action.sms_template or not action.recipient:
-            return
+        print("Current job Id SMS", get_current_job())
+        # Get job ID early to ensure it's available in exception block
 
-        message = frappe.render_template(frappe.db.get_value("SMS Template", action.sms_template, "message"), {})
-        frappe.sendsms(recipients=[action.recipient], message=message)
+        if not action.sms_template or not doc.get('mobile_no'):
+            raise ValueError("Missing mobile number or SMS template")
+        recipient = '+91' + str(doc.get('mobile_no'))
+
+        # Render the SMS message template
+        message_template = frappe.db.get_value("SMS Template", action.sms_template, "template_text")
+        if not message_template:
+            raise ValueError("SMS template not found")
+
+        message = frappe.render_template(message_template, doc)
+        
+        send_sms([recipient], message, sender_name="Logic Links")
+
+        # Fetch job status and log it
+        if job_id:
+            redis_conn = Redis()
+            job = Job.fetch(job_id, connection=redis_conn)
+            status = job.get_status()
+            print("job.exc_info -- SMS", job.exc_info)
+
+            if status == "failed":
+                update_scheduled_job(job_id, status, started_at, job.exc_info)
+            else:
+                update_scheduled_job(job_id, status, started_at)
+
     except Exception as error:
-        print("error", error)
+        print("Error in SMS Sending:", error)
+        if job_id:
+            update_scheduled_job(job_id, "failed", started_at, str(error))
 
+    finally:
+        frappe.destroy()
 
 def assign_task(action, doc):
-
-    print("Current job Id Todo", get_current_job())
-
-    """Create ToDo for assigned user"""
-    print("User ---", action)
+    
     started_at = now_datetime()
+    job_id = get_current_job().id if get_current_job() else None
 
     try:
-        
-        if not action.get('assigned_user'):
-            assigned_user = doc.get('email_id')
-        else:
-            assigned_user = action.get('assigned_user')
+        print("Current job Id Todo", get_current_job())
+        print("User ---", action)
+
+        assigned_user = action.get('assigned_user') or doc.get('email_id')
+        if not assigned_user:
+            raise ValueError("Assigned user not found in action or document")
 
         todo_temp = frappe.get_doc("ToDo Template", action.get('todo_template'))
         if not todo_temp:
-            return
-        
+            raise ValueError("ToDo Template not found")
+
         description = todo_temp.get("description")
-        due_date = todo_temp.get("due_date")
-        # due_date is in seconds , convert to datetime
-        due_date = now_datetime() + timedelta(seconds=due_date)
-        
+        due_in_seconds = todo_temp.get("due_date") or 0
+        due_date = now_datetime() + timedelta(seconds=due_in_seconds)
+
         todo = frappe.get_doc({
             "doctype": "ToDo",
             "description": description,
             "owner": doc.get('lead_owner'),
             "reference_type": "Lead",
             "reference_name": doc.get('name'),
-            "allocated_to":assigned_user,
-            "date":due_date,
-            "assigned_by":doc.get('lead_owner')
+            "allocated_to": assigned_user,
+            "date": due_date,
+            "assigned_by": doc.get('lead_owner')
         }).insert(ignore_permissions=True)
 
         frappe.db.commit()
         print("ToDo created with name:", todo.name)
 
-        job_id = get_current_job().id
+        if job_id:
+            redis_conn = Redis()
+            job = Job.fetch(job_id, connection=redis_conn)
+            status = job.get_status()
+            print("job.exc_info -- TODO", job.exc_info)
 
-        redis_conn = Redis()
-        job = Job.fetch(job_id, connection=redis_conn)
-        status = job.get_status()  # e.g., "queued", "started", "finished"
-        print("job.exc_info -- TODO", job.exc_info)
-        if status == "failed":
-        # Fetch the exception info (if available) for the failed job
-            exc_info = job.exc_info
-            update_scheduled_job(job_id, status, started_at, exc_info)
-        else:
-            update_scheduled_job(job_id, status, started_at)
+            if status == "failed":
+                update_scheduled_job(job_id, status, started_at, job.exc_info)
+            else:
+                update_scheduled_job(job_id, status, started_at)
 
-        
-        
-        
     except Exception as error:
-        print("error user", error)
+        print("Error in ToDo Assignment:", error)
+        if job_id:
+            update_scheduled_job(job_id, "failed", started_at, str(error))
+
     finally:
         frappe.destroy()
 
