@@ -19,7 +19,7 @@ def check_trigger_event(workflow_actions, doc):
             execution_days = int(action.get('execution_time') or 0)
 
             if action_type == "Email":
-                queue_email = Queue(name='email', connection=Redis())
+                # queue_email = Queue(name='email', connection=Redis())
                 email_template = frappe.get_doc("Email Template", action.get("email_template"))
 
                 email_detail = {
@@ -28,85 +28,111 @@ def check_trigger_event(workflow_actions, doc):
                     "doc":doc
                 }
 
-                job = queue_email.enqueue_in(
-                    timedelta(seconds=int(execution_days)),
-                    "workflowbuild.schedule.utils.send_email",
-                    args=[email_detail]
-                )
-                job_args_serializable = []
+                # ------------------------------------ Frappe Scheduler 
+                frappe.enqueue("workflowbuild.schedule.utils.send_email", queue="long", timeout=300, **{
+                    "email_detail": email_detail,
+                })
 
-                for arg in job.args:
-                    try:
-                        job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
-                    except Exception as e:
-                        job_args_serializable.append(str(arg))
+                #  ----------------------------------- Raw RQ code for email
+                # email_detail = {
+                #     "email_temp": email_template,
+                #     "email_id": doc.email_id,
+                #     "doc":doc
+                # }
 
-                job_data = {
-                    "job_id": job.id,
-                    "job_name": job.func_name,  # Use job.func_name instead of private _func_name
-                    "timeout": job.timeout,
-                    "schedule_at": job.enqueued_at or None,
-                    "job_created": job.created_at,
-                    "arguments": json.dumps(job_args_serializable, indent=2),
-                    "status": job.get_status()
-                }
-                job_resp = create_scheduled_job(job_data)
-                print("Email Job Scheduled:", job_resp)
+                # job = queue_email.enqueue_in(
+                #     timedelta(seconds=int(execution_days)),
+                #     "workflowbuild.schedule.utils.send_email",
+                #     args=[email_detail]
+                # )
+                # job_args_serializable = []
+
+                # for arg in job.args:
+                #     try:
+                #         job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
+                #     except Exception as e:
+                #         job_args_serializable.append(str(arg))
+
+                # job_data = {
+                #     "job_id": job.id,
+                #     "job_name": job.func_name,  # Use job.func_name instead of private _func_name
+                #     "timeout": job.timeout,
+                #     "schedule_at": job.enqueued_at or None,
+                #     "job_created": job.created_at,
+                #     "arguments": json.dumps(job_args_serializable, indent=2),
+                #     "status": job.get_status()
+                # }
+                # job_resp = create_scheduled_job(job_data)
+                # print("Email Job Scheduled:", job_resp)
 
             elif action_type == "SMS":
-                queue_sms = Queue(name='sms', connection=Redis())
-                job = queue_sms.enqueue_in(
-                    timedelta(seconds=int(execution_days)),
-                    "workflowbuild.schedule.utils.sends_sms",
-                    args=[action,doc]
-                )
+                # ------------------------------------------------- Frappe Scheduler
+                frappe.enqueue("workflowbuild.schedule.utils.sends_sms", queue="long", timeout=300, **{
+                    "action": action,
+                    "doc": doc
+                })
 
-                job_args_serializable = []
-                for arg in job.args:
-                    try:
-                        job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
-                    except Exception as e:
-                        job_args_serializable.append(str(arg))
+                #  ---------------------------- Raw RQ code for SMS
 
-                job_data = {
-                    "job_id": job.id,
-                    "job_name": job.func_name,
-                    "timeout": job.timeout,
-                    "schedule_at": job.enqueued_at or None,
-                    "job_created": job.created_at,
-                    "arguments": json.dumps(job_args_serializable, indent=2),
-                    "status": job.get_status()
-                }
-                job_resp = create_scheduled_job(job_data)
-                print("SMS Job Scheduled:", job_resp)
+                # queue_sms = Queue(name='sms', connection=Redis())
+                # job = queue_sms.enqueue_in(
+                #     timedelta(seconds=int(execution_days)),
+                #     "workflowbuild.schedule.utils.sends_sms",
+                #     args=[action,doc]
+                # )
 
+                # job_args_serializable = []
+                # for arg in job.args:
+                #     try:
+                #         job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
+                #     except Exception as e:
+                #         job_args_serializable.append(str(arg))
+
+                # job_data = {
+                #     "job_id": job.id,
+                #     "job_name": job.func_name,
+                #     "timeout": job.timeout,
+                #     "schedule_at": job.enqueued_at or None,
+                #     "job_created": job.created_at,
+                #     "arguments": json.dumps(job_args_serializable, indent=2),
+                #     "status": job.get_status()
+                # }
+                # job_resp = create_scheduled_job(job_data)
+                # print("SMS Job Scheduled:", job_resp)
 
             elif action_type == "ToDO":
-                queue_todo = Queue(name='todo', connection=Redis())
-                job = queue_todo.enqueue_in(
-                    timedelta(seconds=int(execution_days)),
-                    "workflowbuild.schedule.utils.assign_task",
-                    args=[action, doc]
-                )
-                job_args_serializable = []
+                # ------------------------------------------------- Frappe Scheduler
+                frappe.enqueue("workflowbuild.schedule.utils.assign_task", queue="long", timeout=300, **{
+                    "action": action,
+                    "doc": doc
+                })
+                # ------------------------------------------------- Raw RQ code for ToDo
 
-                for arg in job.args:
-                    try:
-                        job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
-                    except Exception as e:
-                        job_args_serializable.append(str(arg))
+                # queue_todo = Queue(name='todo', connection=Redis())
+                # job = queue_todo.enqueue_in(
+                #     timedelta(seconds=int(execution_days)),
+                #     "workflowbuild.schedule.utils.assign_task",
+                #     args=[action, doc]
+                # )
+                # job_args_serializable = []
 
-                job_data = {
-                    "job_id": job.id,
-                    "job_name": job.func_name,
-                    "timeout": job.timeout,
-                    "schedule_at": job.enqueued_at or None,
-                    "job_created": job.created_at,
-                    "arguments": json.dumps(job_args_serializable, indent=2),
-                    "status": job.get_status()
-                }
-                job_resp = create_scheduled_job(job_data)
-                print("ToDo Job Scheduled:", job_resp)
+                # for arg in job.args:
+                #     try:
+                #         job_args_serializable.append(json.loads(json.dumps(arg, default=str)))
+                #     except Exception as e:
+                #         job_args_serializable.append(str(arg))
+
+                # job_data = {
+                #     "job_id": job.id,
+                #     "job_name": job.func_name,
+                #     "timeout": job.timeout,
+                #     "schedule_at": job.enqueued_at or None,
+                #     "job_created": job.created_at,
+                #     "arguments": json.dumps(job_args_serializable, indent=2),
+                #     "status": job.get_status()
+                # }
+                # job_resp = create_scheduled_job(job_data)
+                # print("ToDo Job Scheduled:", job_resp)
 
         return True
 
