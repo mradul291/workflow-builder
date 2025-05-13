@@ -17,9 +17,9 @@ scheduler_events = {
     }
 }
 
-override_whitelisted_methods = {
-	"workflowbuild.schedule.logs.refresh_job": "workflowbuild.schedule.logs.refresh_job"
-}
+# override_whitelisted_methods = {
+# 	"workflowbuild.schedule.logs.refresh_job": "workflowbuild.schedule.logs.refresh_job"
+# }
 
 # required_apps = []
 
