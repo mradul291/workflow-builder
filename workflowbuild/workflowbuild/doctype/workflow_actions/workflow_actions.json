@@ -11,7 +11,11 @@
   "sms_template",
   "todo_template",
   "user_role",
-  "assigned_user"
+  "assigned_user",
+  "column_break_cquh",
+  "email_template_view",
+  "todo_template_view",
+  "sms_template_view"
  ],
  "fields": [
   {
@@ -52,7 +56,6 @@
    "fieldname": "assigned_user",
    "fieldtype": "Link",
    "label": "Assigned user",
-   "link_filters": "[[\"User\",\"role\",\"=\",\"eval: doc.user_role\"]]",
    "options": "User"
   },
   {
@@ -61,13 +64,41 @@
    "fieldtype": "Link",
    "label": "User Role",
    "options": "Role"
+  },
+  {
+   "fieldname": "column_break_cquh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.action_type === \"Email\";",
+   "fetch_from": "email_template.response",
+   "fieldname": "email_template_view",
+   "fieldtype": "Small Text",
+   "label": "Email Template View",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'ToDO'",
+   "fetch_from": "todo_template.description",
+   "fieldname": "todo_template_view",
+   "fieldtype": "Small Text",
+   "label": "Todo Template View",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.action_type === 'SMS';",
+   "fetch_from": "sms_template.template_text",
+   "fieldname": "sms_template_view",
+   "fieldtype": "Small Text",
+   "label": "SMS Template View",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-04-30 17:00:22.273720",
+ "modified": "2025-05-15 11:57:54.576357",
  "modified_by": "Administrator",
  "module": "Workflowbuild",
  "name": "Workflow Actions",
