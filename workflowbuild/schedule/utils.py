@@ -9,6 +9,7 @@ from .logs import  update_scheduled_job
 from dotenv import load_dotenv
 from datetime import timedelta
 from frappe.core.doctype.sms_settings.sms_settings import send_sms
+import redis
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 new_path = os.getenv("SITE_PATH")
@@ -20,6 +21,10 @@ os.chdir(new_path)
 frappe.init(site=os.path.join(new_path, site_name))
 frappe.connect(site=os.path.join(new_path, site_name), db_name=db_name)
 
+redis_url = os.environ.get("REDIS_QUEUE")
+        
+redis_conn = redis.from_url(redis_url)
+        
 def send_email(email_detail):
     """Send Email using provided email_template and log job status"""
 
@@ -51,7 +56,7 @@ def send_email(email_detail):
         print("Email sent to:", doc.email_id)
 
         if job_id:
-            redis_conn = Redis()
+            # redis_conn = Redis()
             job = Job.fetch(job_id, connection=redis_conn)
             status = job.get_status()
             print("job.exc_info -- Email", job.exc_info)
@@ -94,7 +99,7 @@ def sends_sms(action, doc):
 
         # Fetch job status and log it
         if job_id:
-            redis_conn = Redis()
+            # redis_conn = Redis()
             job = Job.fetch(job_id, connection=redis_conn)
             status = job.get_status()
             print("job.exc_info -- SMS", job.exc_info)
@@ -148,7 +153,7 @@ def assign_task(action, doc):
         print("ToDo created with name:", todo.name)
 
         if job_id:
-            redis_conn = Redis()
+            # redis_conn = Redis()
             job = Job.fetch(job_id, connection=redis_conn)
             status = job.get_status()
             print("job.exc_info -- TODO", job.exc_info)

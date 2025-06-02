@@ -5,7 +5,7 @@ from frappe.utils import now_datetime
 from redis import Redis
 from rq.job import Job
 from datetime import timedelta
-
+import redis
 
 def create_scheduled_job(job_data):
     
@@ -66,7 +66,12 @@ def refresh_job():
             fields=["name", "job_id", "status"],
             filters={"status": ["not in", ["finished", "failed", "canceled"]]}
         )
-        redis_conn = Redis()
+        redis_url = os.environ.get("REDIS_QUEUE")
+        if not redis_url:
+            print("REDIS_QUEUE environment variable not set")
+            return False
+
+        redis_conn = redis.from_url(redis_url)
 
         for job_meta in scheduled_jobs:
             job_id = job_meta.job_id
