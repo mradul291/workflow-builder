@@ -56,7 +56,7 @@ def update_scheduled_job(job_id, status=None, started_at=None, error_msg=None):
         frappe.log_error(frappe.get_traceback(), "Scheduled Job Update Error")
         print(f"Error updating Scheduled Job '{job_id}':", e)
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def refresh_job():
     try:
         print("Refresh Active")
@@ -119,3 +119,13 @@ def refresh_job():
 
     except Exception as e:
         print("Error in refresh_job:", e)
+
+
+def check_cron_job():
+    try:
+        print("Check Cron Job Active")
+        frappe.logger().info("Scheduled task ran.")
+        
+
+    except Exception as e:
+        print("Error in check_cron_job:", e)
