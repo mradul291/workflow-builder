@@ -6,21 +6,38 @@ import redis
 from .logs import create_scheduled_job
 import os
 import json
+from .logs import create_scheduled_job
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())  # Optional: only for dev or Docker logs
+
 
 def check_trigger_event(workflow_actions, doc):
     print("start path",os.getcwd())
+    logger.info("Started check_trigger_event in path: %s", os.getcwd())
     try:
         """Cron job to check if any workflow event is triggered and act on the configured actions"""
         print("Current Path",os.getcwd())
         
-        redis_conn = redis.from_url(os.environ.get("REDIS_QUEUE"))
+        redis_url = os.environ.get("REDIS_QUEUE")
+        if not redis_url:
+            logger.error("REDIS_QUEUE environment variable not set")
+            return False
+
+        redis_conn = redis.from_url(redis_url)
+        logger.info("Connected to Redis at: %s", redis_url)
+
         for action in workflow_actions:
 
             action_type = action.get('action_type')  # Email, SMS, ToDo
             execution_days = int(action.get('execution_time') or 0)
+            logger.info("Processing action: %s", action_type)
 
             if action_type == "Email":
-                queue_email = Queue(name='email', connection=redis_conn)
+                logger.info("Action Email Start")
+                queue_email = Queue(name='home-frappe-frappe-bench:email', connection=redis_conn)
                 email_template = frappe.get_doc("Email Template", action.get("email_template"))
 
                 email_detail = {
@@ -53,9 +70,11 @@ def check_trigger_event(workflow_actions, doc):
                 }
                 job_resp = create_scheduled_job(job_data)
                 print("Email Job Scheduled:", job_resp)
+                logger.info("Action Email Ended")
 
             elif action_type == "SMS":
-                queue_sms = Queue(name='sms', connection=redis_conn)
+                logger.info("Action SMS Start")
+                queue_sms = Queue(name='home-frappe-frappe-bench:sms', connection=redis_conn)
                 job = queue_sms.enqueue_in(
                     timedelta(seconds=int(execution_days)),
                     "workflowbuild.schedule.utils.sends_sms",
@@ -79,11 +98,14 @@ def check_trigger_event(workflow_actions, doc):
                     "status": job.get_status()
                 }
                 job_resp = create_scheduled_job(job_data)
+                logger.info("Action SMS Ended")
+
                 print("SMS Job Scheduled:", job_resp)
 
 
             elif action_type == "ToDO":
-                queue_todo = Queue(name='todo', connection=redis_conn)
+                logger.info("Action ToDo Start")
+                queue_todo = Queue(name='home-frappe-frappe-bench:todo', connection=redis_conn)
                 job = queue_todo.enqueue_in(
                     timedelta(seconds=int(execution_days)),
                     "workflowbuild.schedule.utils.assign_task",
@@ -108,6 +130,9 @@ def check_trigger_event(workflow_actions, doc):
                 }
                 job_resp = create_scheduled_job(job_data)
                 print("ToDo Job Scheduled:", job_resp)
+                logger.info("Action ToDo Ended")
+                
+        logger.info("Completed check_trigger_event")
 
         return True
 
