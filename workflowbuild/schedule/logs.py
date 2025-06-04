@@ -66,7 +66,7 @@ def refresh_job():
             fields=["name", "job_id", "status"],
             filters={"status": ["not in", ["finished", "failed", "canceled"]]}
         )
-        redis_url = os.environ.get("REDIS_QUEUE")
+        redis_url = "redis://redis-queue:6379"
         if not redis_url:
             print("REDIS_QUEUE environment variable not set")
             return False
@@ -125,6 +125,7 @@ def check_cron_job():
     try:
         print("Check Cron Job Active")
         frappe.logger().info("Scheduled task ran.")
+        print("Check Cron Job DONE")
         
 
     except Exception as e:

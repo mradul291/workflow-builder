@@ -14,7 +14,7 @@ scheduler_events = {
         "0/1 * * * *": [  # every 1 minute
           "workflowbuild.schedule.logs.refresh_job"  # function to execute
         ],
-        "0/1 * * * *": [  # every 1 minute
+        "0/2 * * * *": [  # every 1 minute
           "workflowbuild.schedule.logs.check_cron_job"  # function to execute
         ]
     }
